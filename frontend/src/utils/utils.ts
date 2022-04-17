@@ -1,0 +1,78 @@
+export const convertHexToRGB = (hex: string) => {
+  // check if it's a rgba
+  if (hex.match("rgba")) {
+    const triplet = hex.slice(5).split(",").slice(0, -1).join(",");
+    return triplet;
+  }
+
+  let c: any;
+  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+    c = hex.substring(1).split("");
+    if (c.length === 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+    c = "0x" + c.join("");
+
+    return [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(",");
+  }
+};
+
+// eslint-disable-next-line
+export function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+type Order = "asc" | "desc";
+// eslint-disable-next-line
+export function getComparator<T = any>(
+  order: Order,
+  orderBy: keyof T,
+): (a: T, b: T) => number {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+export const stableSort = <T>(
+  array: readonly T[],
+  comparator: (a: T, b: T) => number,
+) => {
+  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+};
+
+export const selectHandler = (selected: string[], name: string) => {
+  const selectedIndex = selected.indexOf(name);
+  let newSelected: string[] = [];
+
+  if (selectedIndex === -1) {
+    newSelected = newSelected.concat(selected, name);
+  } else if (selectedIndex === 0) {
+    newSelected = newSelected.concat(selected.slice(1));
+  } else if (selectedIndex === selected.length - 1) {
+    newSelected = newSelected.concat(selected.slice(0, -1));
+  } else if (selectedIndex > 0) {
+    newSelected = newSelected.concat(
+      selected.slice(0, selectedIndex),
+      selected.slice(selectedIndex + 1),
+    );
+  }
+  return newSelected;
+};
+
+export const isSelected = (name: string, selected: string[]) => {
+  return selected.indexOf(name) !== -1;
+};

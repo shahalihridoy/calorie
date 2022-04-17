@@ -1,0 +1,19 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "cSpell.words": ["Gurantee"],
+  "material-ui-snippets.showNotesOnStartup": false,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "explorer.confirmDragAndDrop": false,
+  "editor.inlineSuggest.enabled": true,
+  "redhat.telemetry.enabled": true,
+  "prettier.trailingComma": "none",
+  "prettier.singleQuote": true,
+  "prettier.semi": false,
+  "vscode-edge-devtools.mirrorEdits": true,
+  "editor.formatOnSave": true
+}
