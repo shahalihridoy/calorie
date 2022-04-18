@@ -48,6 +48,7 @@ class FoodApiHelper {
         data: entry,
       }),
       transformResponse: transformRTKResponse,
+      invalidatesTags: ["Food-Entries-Threshold"],
       onQueryStarted: async ({ meal }, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
@@ -76,6 +77,7 @@ class FoodApiHelper {
         data: entry,
       }),
       transformResponse: transformRTKResponse,
+      invalidatesTags: ["Food-Entries-Threshold"],
       onQueryStarted: async ({ meal }, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;

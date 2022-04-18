@@ -1,6 +1,7 @@
 import CustomFlexBox from "@components/atoms/CustomFlexBox";
 import CustomTextField from "@components/atoms/CustomTextField";
 import { Span } from "@components/atoms/Typography";
+import InviteUser from "@components/layout/InviteUser";
 import { useAppSelector } from "@hooks/reduxHooks";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
@@ -56,9 +57,7 @@ const Topbar: React.VFC<TopbarProps> = ({
         </CustomFlexBox>
 
         <CustomFlexBox sx={{ alignItems: "center" }}>
-          <Button variant="outlined" color="primary" sx={{ ml: "1rem" }}>
-            <Span>Invite</Span>
-          </Button>
+          <InviteUser />
           <Button
             variant="outlined"
             sx={{

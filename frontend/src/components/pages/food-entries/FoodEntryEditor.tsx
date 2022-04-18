@@ -6,13 +6,14 @@ import { H6 } from "@components/atoms/Typography";
 import { useAppDispatch, useAppSelector } from "@hooks/reduxHooks";
 import { LoadingButton } from "@mui/lab";
 import { Button, Grid, MenuItem } from "@mui/material";
+import { getAllUsers } from "@redux/auth/authApi";
 import {
   useAddFoodEntryMutation,
   useUpdateFoodEntryMutation,
 } from "@redux/food/foodApi";
 import { getMealsByUser } from "@redux/meal/mealApi";
 import { AuthRoles } from "@shared/enums";
-import { FoodEntry, Meal } from "@shared/types";
+import { FoodEntry, Meal, User } from "@shared/types";
 import { Formik } from "formik";
 import React, { FC, useEffect, useState } from "react";
 import * as yup from "yup";
@@ -24,11 +25,13 @@ interface Props {
 
 const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>();
   const [updateFoodEntry] = useUpdateFoodEntryMutation();
   const [addFoodEntry] = useAddFoodEntryMutation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+  const foodEntryUser = foodEntry?.user;
 
   const handleFormSubmit = async (values: FoodEntry) => {
     const meal = meals.find((meal) => meal._id === values.meal) as Meal;
@@ -53,6 +56,13 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
     return now.toISOString().slice(0, 16);
   };
 
+  const handleUserChange =
+    (setFieldValue: any) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const selectedUserId = e.target.value;
+      setSelectedUser(selectedUserId);
+      setFieldValue("user", selectedUserId);
+    };
+
   useEffect(() => {
     if (selectedUser) {
       dispatch(getMealsByUser.initiate(selectedUser)).then(
@@ -66,8 +76,17 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
   useEffect(() => {
     if (user?.role === AuthRoles.USER) {
       setSelectedUser(user?._id);
+    } else {
+      if (foodEntryUser) {
+        setSelectedUser(foodEntryUser);
+      }
+      dispatch(getAllUsers.initiate()).then(({ data: users }) => {
+        setUsers(users);
+      });
     }
-  }, [user]);
+  }, [user, foodEntryUser, dispatch]);
+
+  console.log(meals);
 
   return (
     <CustomBox
@@ -89,6 +108,7 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
           errors,
           touched,
           isSubmitting,
+          setFieldValue,
           handleChange,
           handleBlur,
           handleSubmit,
@@ -126,6 +146,27 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
                   }
                 />
               </Grid>
+              {user?.role === AuthRoles.ADMIN && (
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    select
+                    fullWidth
+                    label="User"
+                    name="user"
+                    value={values.user}
+                    onChange={handleUserChange(setFieldValue)}
+                    onBlur={handleBlur}
+                    error={Boolean(errors.user && touched.user)}
+                    helperText={errors.user && touched.user && errors.user}
+                  >
+                    {users.map((user) => (
+                      <MenuItem value={user._id} key={user._id}>
+                        {user.name}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
+                </Grid>
+              )}
               <Grid item xs={12} md={6}>
                 <CustomTextField
                   select

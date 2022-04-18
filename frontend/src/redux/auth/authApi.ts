@@ -18,11 +18,14 @@ export const authApi = createApi({
         method: "POST",
         data: credentials,
       }),
-      transformResponse: transformRTKResponse,
     }),
     getUser: builder.query<any, void>({
       query: () => "/auth/verify-token",
       providesTags: [{ type: "User" }],
+      transformResponse: transformRTKResponse,
+    }),
+    getAllUsers: builder.query<any, void>({
+      query: () => "/users",
       transformResponse: transformRTKResponse,
     }),
   }),
@@ -35,3 +38,4 @@ export const authApi = createApi({
 
 // Export hooks for usage in functional components
 export const { useInviteUserMutation, useGetUserQuery } = authApi;
+export const { getAllUsers, inviteUser } = authApi.endpoints;

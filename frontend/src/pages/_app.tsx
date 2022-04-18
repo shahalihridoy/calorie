@@ -12,7 +12,6 @@ import Router from "next/router";
 import nProgress from "nprogress";
 import "nprogress/nprogress.css";
 import React, { useEffect } from "react";
-import "react-image-gallery/styles/css/image-gallery.css";
 import { NotificationContainer } from "react-notifications";
 import "react-notifications/lib/notifications.css";
 
