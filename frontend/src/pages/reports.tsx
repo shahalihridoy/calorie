@@ -38,7 +38,7 @@ const Index = () => {
       />
       <ReportCard
         title="This Week Average Calorie"
-        count={data?.lastWeek}
+        count={data?.averageCalorie}
         bgcolor="warning.main"
       />
     </CustomBox>

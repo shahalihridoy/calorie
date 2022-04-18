@@ -17,27 +17,31 @@ export const convertHexToRGB = (hex: string) => {
   }
 };
 
-// eslint-disable-next-line
-export function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
+export const descendingComparator = <T>(a: T, b: T, orderBy: keyof T) => {
+  const properties = (orderBy as string).split(".");
+  properties.forEach((key: string) => {
+    a = (a as Record<string, any>)[key];
+    b = (b as Record<string, any>)[key];
+  });
+
+  if (b < a) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (b > a) {
     return 1;
   }
   return 0;
-}
+};
 
 type Order = "asc" | "desc";
-// eslint-disable-next-line
-export function getComparator<T = any>(
+export const getComparator = <T = any>(
   order: Order,
   orderBy: keyof T,
-): (a: T, b: T) => number {
+): ((a: T, b: T) => number) => {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
-}
+};
 
 export const stableSort = <T>(
   array: readonly T[],

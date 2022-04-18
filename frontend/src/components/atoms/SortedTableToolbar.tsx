@@ -109,7 +109,7 @@ const SortedTableToolbar = <T,>(props: Props<T>) => {
               color="primary"
               variant="contained"
               sx={{ ml: "20px" }}
-              onClick={() => buttonClick && buttonClick()}
+              onClick={buttonClick}
             >
               <AddIcon sx={{ mr: "8px", fontSize: "20px" }} />
               {buttonText}

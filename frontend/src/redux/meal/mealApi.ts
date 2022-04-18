@@ -14,6 +14,7 @@ export const mealApi = createApi({
   }),
   endpoints: (builder: IBuilder) => ({
     getMeals: mealApiHelper.getMeals(builder),
+    getMealsByUser: mealApiHelper.getMealsByUser(builder),
     addMeal: mealApiHelper.addMeal(builder),
     updateMeal: mealApiHelper.updateMeal(builder),
     deleteMeal: mealApiHelper.deleteMeal(builder),
@@ -31,3 +32,5 @@ export const {
   useUpdateMealMutation,
   useDeleteMealMutation,
 } = mealApi;
+
+export const { getMealsByUser } = mealApi.endpoints;

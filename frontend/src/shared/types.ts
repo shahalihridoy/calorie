@@ -25,6 +25,7 @@ export interface FoodEntry {
   name: string;
   calorie: number;
   date: string;
+  user: string;
   meal: Pick<Meal, "_id" | "name"> | string;
 }
 

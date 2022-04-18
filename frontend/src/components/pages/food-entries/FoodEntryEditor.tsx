@@ -3,15 +3,18 @@ import CustomFlexBox from "@components/atoms/CustomFlexBox";
 import CustomTextField from "@components/atoms/CustomTextField";
 import NotificationManager from "@components/atoms/NotificationManager";
 import { H6 } from "@components/atoms/Typography";
+import { useAppDispatch, useAppSelector } from "@hooks/reduxHooks";
 import { LoadingButton } from "@mui/lab";
 import { Button, Grid, MenuItem } from "@mui/material";
 import {
   useAddFoodEntryMutation,
   useUpdateFoodEntryMutation,
 } from "@redux/food/foodApi";
-import { FoodEntry } from "@shared/types";
+import { getMealsByUser } from "@redux/meal/mealApi";
+import { AuthRoles } from "@shared/enums";
+import { FoodEntry, Meal } from "@shared/types";
 import { Formik } from "formik";
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import * as yup from "yup";
 
 interface Props {
@@ -20,16 +23,22 @@ interface Props {
 }
 
 const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
+  const [meals, setMeals] = useState<Meal[]>([]);
+  const [selectedUser, setSelectedUser] = useState<string>();
   const [updateFoodEntry] = useUpdateFoodEntryMutation();
   const [addFoodEntry] = useAddFoodEntryMutation();
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
 
   const handleFormSubmit = async (values: FoodEntry) => {
+    const meal = meals.find((meal) => meal._id === values.meal) as Meal;
     try {
       if (foodEntry?._id) {
-        await updateFoodEntry(values).unwrap();
-      } else {
-        await addFoodEntry(values).unwrap();
-      }
+        await updateFoodEntry({ entry: values, meal }).unwrap();
+      } else if (selectedUser) {
+        values.user = selectedUser;
+        await addFoodEntry({ entry: values, meal }).unwrap();
+      } else return;
       NotificationManager.success("Entry saved successfully");
     } catch (error: any) {
       NotificationManager.error(error.data.message);
@@ -43,6 +52,22 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     return now.toISOString().slice(0, 16);
   };
+
+  useEffect(() => {
+    if (selectedUser) {
+      dispatch(getMealsByUser.initiate(selectedUser)).then(
+        ({ data: meals }) => {
+          setMeals(meals);
+        },
+      );
+    }
+  }, [dispatch, selectedUser]);
+
+  useEffect(() => {
+    if (user?.role === AuthRoles.USER) {
+      setSelectedUser(user?._id);
+    }
+  }, [user]);
 
   return (
     <CustomBox
@@ -113,10 +138,11 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
                   error={Boolean(errors.meal && touched.meal)}
                   helperText={errors.meal && touched.meal && errors.meal}
                 >
-                  <MenuItem value="breakfast">Breakfast</MenuItem>
-                  <MenuItem value="lunch">Lunch</MenuItem>
-                  <MenuItem value="dinner">Dinner</MenuItem>
-                  <MenuItem value="snack">Snack</MenuItem>
+                  {meals.map((meal) => (
+                    <MenuItem value={meal._id} key={meal._id}>
+                      {meal.name}
+                    </MenuItem>
+                  ))}
                 </CustomTextField>
               </Grid>
               <Grid item xs={12} md={6}>

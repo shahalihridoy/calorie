@@ -25,6 +25,13 @@ class FoodApiHelper {
       transformResponse: transformRTKResponse,
     });
 
+  static getMealsByUser = (builder: IBuilder) =>
+    builder.query<any, string>({
+      query: (userId) => `/meals/user/${userId}`,
+      providesTags: [{ type: "Meal", id: "userId" }],
+      transformResponse: transformRTKResponse,
+    });
+
   static addMeal = (builder: IBuilder) =>
     builder.mutation<any, Meal>({
       query: (meal) => ({

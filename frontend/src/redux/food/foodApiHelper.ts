@@ -3,7 +3,7 @@ import { foodApi } from "@redux/food/foodApi";
 import { BaseQueryFn } from "@reduxjs/toolkit/dist/query";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 import { thresholdCalorie } from "@shared/constants";
-import { FoodEntry } from "@shared/types";
+import { FoodEntry, Meal } from "@shared/types";
 import { transformRTKResponse } from "@utils/RTKUtils";
 
 export type IBuilder = EndpointBuilder<
@@ -41,14 +41,14 @@ class FoodApiHelper {
     });
 
   static addFoodEntry = (builder: IBuilder) =>
-    builder.mutation<any, FoodEntry>({
-      query: (foodEntry) => ({
+    builder.mutation<any, { entry: FoodEntry; meal: Meal }>({
+      query: ({ entry }) => ({
         url: "/food-entries",
         method: "POST",
-        data: foodEntry,
+        data: entry,
       }),
       transformResponse: transformRTKResponse,
-      onQueryStarted: async (foodEntry, { dispatch, queryFulfilled }) => {
+      onQueryStarted: async ({ meal }, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
 
@@ -57,7 +57,7 @@ class FoodApiHelper {
               "getFoodEntries",
               undefined,
               (list: FoodEntry[]) => {
-                list.push(data);
+                list.push({ ...data, meal });
                 return list;
               },
             ),
@@ -69,14 +69,14 @@ class FoodApiHelper {
     });
 
   static updateFoodEntry = (builder: IBuilder) =>
-    builder.mutation<any, FoodEntry>({
-      query: (foodEntry) => ({
+    builder.mutation<any, { entry: FoodEntry; meal: Meal }>({
+      query: ({ entry }) => ({
         url: "/food-entries",
         method: "PUT",
-        data: foodEntry,
+        data: entry,
       }),
       transformResponse: transformRTKResponse,
-      onQueryStarted: async (foodEntry, { dispatch, queryFulfilled }) => {
+      onQueryStarted: async ({ meal }, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
           dispatch(
@@ -85,7 +85,7 @@ class FoodApiHelper {
               undefined,
               (list: FoodEntry[]) => {
                 return list.map((item) => {
-                  if (item._id === data._id) return data;
+                  if (item._id === data._id) return { ...data, meal };
                   return item;
                 });
               },

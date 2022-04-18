@@ -22,7 +22,7 @@ import {
 } from "@redux/food/foodApi";
 import { AuthRoles } from "@shared/enums";
 import { ellipsis } from "@shared/styles";
-import { FoodEntry } from "@shared/types";
+import { FoodEntry, Meal } from "@shared/types";
 import {
   getComparator,
   isSelected,
@@ -195,16 +195,20 @@ const FoodEntries = () => {
                       <TableCell align="left" sx={ellipsis}>
                         {row.name}
                       </TableCell>
-                      <TableCell align="left" sx={ellipsis}>
-                        {row.calorie}
+                      <TableCell align="left">
+                        {(row.meal as Meal).name}
                       </TableCell>
+                      <TableCell align="left">{row.calorie}</TableCell>
                       <TableCell align="left">
                         {row.date &&
                           format(new Date(row.date), "dd MMM, yyyy HH:mm a")}
                       </TableCell>
                       <TableCell align="left">
                         <SortedTableAction
-                          onEdit={handleEditClick(row)}
+                          onEdit={handleEditClick({
+                            ...row,
+                            meal: (row.meal as Meal)._id,
+                          })}
                           onDelete={handleDeleteFoodEntries([row._id])}
                         />
                       </TableCell>
@@ -252,6 +256,12 @@ export const tableHeadData = [
     numeric: false,
     disablePadding: false,
     label: "Food",
+  },
+  {
+    id: "meal.name",
+    numeric: false,
+    disablePadding: false,
+    label: "Meal",
   },
   {
     id: "calorie",
