@@ -61,13 +61,14 @@ exports.getAllFoodEntriesThreshold = catchAsync(async (req, res, next) => {
 exports.getFoodEntryAnalytics = catchAsync(async (req, res, next) => {
   const thisWeek = new Date();
   const lastWeek = new Date();
+  thisWeek.setHours(0, 0, 0, 0);
+  lastWeek.setHours(0, 0, 0, 0);
   thisWeek.setDate(thisWeek.getDate() - 6);
   lastWeek.setDate(thisWeek.getDate() - 6);
 
   const p1 = FoodEntry.count({
     date: {
       $gte: thisWeek,
-      // $lte: new Date(2020, 11, 31),
     },
   });
 
@@ -78,13 +79,43 @@ exports.getFoodEntryAnalytics = catchAsync(async (req, res, next) => {
     },
   });
 
-  const [thisWeekEntryCount, lastWeekEntryCount] = await Promise.all([p1, p2]);
+  const p3 = FoodEntry.aggregate([
+    {
+      $match: {
+        date: {
+          $gte: thisWeek,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$user",
+        calorie: { $sum: "$calorie" },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        calorie: { $avg: "$calorie" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        calorie: 1,
+      },
+    },
+  ]);
+
+  const [thisWeekEntryCount, lastWeekEntryCount, averageCaloriePerUser] =
+    await Promise.all([p1, p2, p3]);
 
   res.status(200).json({
     status: "success",
     data: {
       thisWeek: thisWeekEntryCount,
       lastWeek: lastWeekEntryCount,
+      averageCalorie: averageCaloriePerUser[0]?.calorie ?? 0,
     },
   });
 });
