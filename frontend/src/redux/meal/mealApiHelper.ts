@@ -1,4 +1,5 @@
 import { BaseQueryFnArgs } from "@redux/axiosBaseQuery";
+import { foodApi } from "@redux/food/foodApi";
 import { mealApi } from "@redux/meal/mealApi";
 import { BaseQueryFn } from "@reduxjs/toolkit/dist/query";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
@@ -75,10 +76,7 @@ class FoodApiHelper {
           const { data } = await queryFulfilled;
 
           // invalidate the entries for the meal
-          dispatch({
-            type: "foodApi/invalidateTags",
-            payload: ["Food-Entries"],
-          });
+          dispatch(foodApi.util.invalidateTags(["Food-Entries"]));
 
           // update meal list
           dispatch(
