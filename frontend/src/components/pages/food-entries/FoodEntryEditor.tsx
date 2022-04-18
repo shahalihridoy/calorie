@@ -61,6 +61,7 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
       const selectedUserId = e.target.value;
       setSelectedUser(selectedUserId);
       setFieldValue("user", selectedUserId);
+      setFieldValue("meal", "");
     };
 
   useEffect(() => {
@@ -85,8 +86,6 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
       });
     }
   }, [user, foodEntryUser, dispatch]);
-
-  console.log(meals);
 
   return (
     <CustomBox
