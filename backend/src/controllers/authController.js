@@ -35,8 +35,6 @@ const getUserFromToken = async (req, res, next) => {
 exports.verifyToken = catchAsync(async (req, res, next) => {
   const user = await getUserFromToken(req, res, next);
   req.user = user;
-  console.log("testin....");
-  console.log(user);
   res.status(200).json({
     status: "success",
     data: user,

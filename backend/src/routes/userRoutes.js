@@ -9,5 +9,8 @@ router.use(authController.protectRoute);
 router
   .route("/search")
   .get(authController.restricTo(userTypes.ADMIN), userController.searchUser);
+router
+  .route("/")
+  .get(authController.restricTo(userTypes.ADMIN), userController.getAllUsers);
 
 module.exports = router;

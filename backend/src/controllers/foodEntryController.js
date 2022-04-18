@@ -1,6 +1,8 @@
 const FoodEntry = require("../models/foodEntryModel");
+const Meal = require("../models/mealModel");
 const catchAsync = require("../utils/catchAsync");
 const { userTypes } = require("../utils/constants");
+const AppError = require("../utils/appError");
 
 exports.getAllFoodEntries = catchAsync(async (req, res, next) => {
   let foodEntries = [];
@@ -122,6 +124,29 @@ exports.getFoodEntryAnalytics = catchAsync(async (req, res, next) => {
 
 exports.addFoodEntry = catchAsync(async (req, res, next) => {
   const data = req.body;
+  const startDate = data.date ? new Date(data.date) : new Date();
+  const endDate = data.date ? new Date(data.date) : new Date();
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(23, 59, 59, 999);
+
+  const p1 = await FoodEntry.count({
+    date: {
+      $gte: startDate,
+      $lte: endDate,
+    },
+  });
+  const p2 = await Meal.findById(data.meal);
+
+  const [entryCount, meal] = await Promise.all([p1, p2]);
+
+  if (entryCount >= meal.maxFoodItemCount) {
+    return next(
+      new AppError(
+        "You have reached the maximum number of food items for this meal.",
+        400
+      )
+    );
+  }
 
   const foodEntry = await FoodEntry.create(data);
 

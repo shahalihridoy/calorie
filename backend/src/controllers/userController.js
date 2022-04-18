@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
+const { userTypes } = require("../utils/constants");
 
 exports.searchUser = catchAsync(async (req, res, next) => {
   const searchTerm = req.query?.name || "";
@@ -25,6 +26,16 @@ exports.searchUser = catchAsync(async (req, res, next) => {
       $limit: 10,
     },
   ]);
+
+  res.status(200).json({
+    length: users.length,
+    status: "success",
+    data: users,
+  });
+});
+
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find({ role: userTypes.USER });
 
   res.status(200).json({
     length: users.length,
