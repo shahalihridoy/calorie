@@ -16,5 +16,5 @@ export const userToken = {
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNTlmZmRjYmMyMTk4Mjg1NmNjZTgzMyIsImlhdCI6MTY1MDA2NTM4NSwiZXhwIjoxNjU3ODQxMzg1fQ.GWFiyiGccvY-q3bu2f8iEltBjW0c9rkMe6xkE7Ukuv0",
 };
 
-export const currentUserToken = userToken.admin;
+export const currentUserToken = userToken.user2;
 export const thresholdCalorie = 500;

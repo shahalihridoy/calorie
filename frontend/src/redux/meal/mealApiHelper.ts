@@ -73,6 +73,14 @@ class FoodApiHelper {
       onQueryStarted: async (Meal, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
+
+          // invalidate the entries for the meal
+          dispatch({
+            type: "foodApi/invalidateTags",
+            payload: ["Food-Entries"],
+          });
+
+          // update meal list
           dispatch(
             mealApi.util.updateQueryData(
               "getMeals",
