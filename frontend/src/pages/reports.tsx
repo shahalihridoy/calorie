@@ -25,13 +25,13 @@ const Index = () => {
       }}
     >
       <ReportCard
-        title="This Week"
+        title="This Week Entries"
         hasIncreased={hasIncreased}
         count={data?.thisWeek}
         bgcolor="primary.main"
       />
       <ReportCard
-        title="Last Week"
+        title="Last Week Entries"
         hasIncreased={!hasIncreased}
         count={data?.lastWeek}
         bgcolor="primary.main"

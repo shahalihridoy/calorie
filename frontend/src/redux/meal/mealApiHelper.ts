@@ -40,6 +40,7 @@ class FoodApiHelper {
         data: meal,
       }),
       transformResponse: transformRTKResponse,
+      invalidatesTags: [{ type: "Meal", id: "userId" }],
       onQueryStarted: async (meal, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
@@ -68,6 +69,7 @@ class FoodApiHelper {
         data: Meal,
       }),
       transformResponse: transformRTKResponse,
+      invalidatesTags: [{ type: "Meal", id: "userId" }],
       onQueryStarted: async (Meal, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
