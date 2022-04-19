@@ -1,4 +1,3 @@
-import CustomFlexBox from "@components/atoms/CustomFlexBox";
 import { ListItemButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import MuiDrawer from "@mui/material/Drawer";
@@ -64,28 +63,6 @@ export const CustomAppBar = styled(MuiAppBar, {
   }),
 }));
 
-export const StyledListItem = styled(ListItemButton)(({ theme }) => ({
-  padding: "9px 10px",
-  margin: "10px 0px",
-  borderRadius: "5px",
-  display: "flex",
-  alignItems: "center",
-  "& svg": {
-    transition: "300ms",
-    color: theme.palette.grey[700],
-    fontSize: "20px",
-  },
-  "& p": {
-    marginLeft: "8px",
-    fontWeight: 600,
-    color: theme.palette.text.primary,
-  },
-  "&.active": {
-    background: theme.palette.primary.main,
-    "& svg, p": { color: theme.palette.grey[50] },
-  },
-}));
-
 export const StyledListItemButton = styled(ListItemButton)<{ active: string }>(
   ({ active, theme }) => ({
     marginBottom: 8,
@@ -99,46 +76,3 @@ export const StyledListItemButton = styled(ListItemButton)<{ active: string }>(
     },
   }),
 );
-
-export const Dot = styled("div")({
-  width: 5,
-  height: 5,
-  marginRight: 10,
-  borderRadius: "50%",
-});
-
-export const SubMenuItem = styled(CustomFlexBox, {
-  shouldForwardProp: (props) => props !== "active",
-})<{ active: boolean }>(({ theme, active }) => ({
-  cursor: "pointer",
-  overflow: "hidden",
-  alignItems: "center",
-  position: "relative",
-  padding: "0.6rem 1rem",
-  backgroundColor: active ? theme.palette.grey[200] : "transparent",
-  "& div": {
-    backgroundColor: active
-      ? theme.palette.primary.main
-      : theme.palette.grey[600],
-  },
-  "& small": {
-    color: active ? theme.palette.primary.main : theme.palette.text.primary,
-  },
-  "&:hover": {
-    backgroundColor: theme.palette.grey[200],
-    "& div": { backgroundColor: theme.palette.primary.main },
-    "& small": { color: theme.palette.primary.main },
-    "&::before": { opacity: 1 },
-  },
-  "&::before": {
-    left: 0,
-    width: 2,
-    content: '""',
-    height: "100%",
-    borderRadius: 5,
-    position: "absolute",
-    opacity: active ? 1 : 0,
-    transition: "opacity 0.3s ease",
-    backgroundColor: theme.palette.primary.main,
-  },
-}));

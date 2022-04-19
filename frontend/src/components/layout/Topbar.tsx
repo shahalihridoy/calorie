@@ -6,7 +6,7 @@ import { useAppSelector } from "@hooks/reduxHooks";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import { Button, Container, IconButton } from "@mui/material";
-import { CustomAppBar } from "./NavbarStyles";
+import { CustomAppBar } from "./LayoutStyles";
 
 interface TopbarProps {
   open?: boolean;

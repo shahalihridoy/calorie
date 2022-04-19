@@ -1,19 +1,10 @@
 <p align="center">
-  <h1 align="center">Next-MUI-Starter</h1>
+  <h1 align="center">Calorie</h1>
 </p>
 
 <p align="center">
-  Next.Js boilerplate with Material-UI v5
+  Next.Js with Material-UI v5
 </p>
-
-<br>
-
-- 📏 **ESLint** — Pluggable JavaScript linter
-- 💖 **Prettier** - Opinionated Code Formatter
-- 🐶 **Husky** — Use git hooks with ease
-- 🚫 **lint-staged** - Run linters against staged git files
-- 👷 **PR Workflow** - Run Type Check & Linters on pull requests
-- 🗂 **Absolute import** - Import folders and files using the `@` prefix
 
 ## 🚀 Getting started
 

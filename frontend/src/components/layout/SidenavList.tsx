@@ -1,7 +1,7 @@
 import CustomBox from "@components/atoms/CustomBox";
 import NextLink from "@components/atoms/NextLink";
 import { H6 } from "@components/atoms/Typography";
-import { StyledListItemButton } from "@components/layout/NavbarStyles";
+import { StyledListItemButton } from "@components/layout/LayoutStyles";
 import { useAppSelector } from "@hooks/reduxHooks";
 import { List } from "@mui/material";
 import { AuthRoles } from "@shared/enums";

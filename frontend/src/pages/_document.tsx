@@ -1,6 +1,6 @@
 import createEmotionServer from "@emotion/server/create-instance";
+import { emotionLTRCache } from "@shared/emotionCache";
 import theme from "@shared/theme";
-import { emotionLTRCache } from "@utils/emotionCache";
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import React from "react";
 

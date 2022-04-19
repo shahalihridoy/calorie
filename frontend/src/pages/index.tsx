@@ -1,11 +1,11 @@
 import withAuth from "@auth/withAuth";
 import CustomCard from "@components/atoms/CustomCard";
 import DataLoader from "@components/atoms/DataLoader";
-import NotificationManager from "@components/atoms/NotificationManager";
 import SortedTableAction from "@components/atoms/SortedTableAction";
 import SortedTableToolbar from "@components/atoms/SortedTableToolbar";
 import DashboardLayout from "@components/layout/DashboardLayout";
 import FoodEntryEditor from "@components/pages/food-entries/FoodEntryEditor";
+import useSortableTable from "@hooks/useSortableTable";
 import { Dialog } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import Table from "@mui/material/Table";
@@ -23,101 +23,49 @@ import {
 import { AuthRoles } from "@shared/enums";
 import { ellipsis } from "@shared/styles";
 import { FoodEntry, Meal } from "@shared/types";
-import {
-  getComparator,
-  isSelected,
-  selectHandler,
-  stableSort,
-} from "@utils/utils";
+import { getComparator, isSelected, stableSort } from "@utils/utils";
 import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 const FoodEntries = () => {
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<keyof FoodEntry>("name");
-  const [selectedFoodEntries, setSelectedFoodEntries] = useState<string[]>([]);
-  const [isFoodEntryModalOpen, setIsFoodEntryModalOpen] = useState(false);
-  const [editableFoodEntry, setEditableFoodEntry] = useState<FoodEntry>();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [foodEntryList, setFoodEntryList] = useState<FoodEntry[]>([]);
-
-  const [deleteFoodEntries] = useDeleteFoodEntryMutation();
-  const { data, isLoading } = useGetFoodEntriesQuery();
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof FoodEntry,
-  ) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelecteds = foodEntryList.map((n) => n._id);
-      setSelectedFoodEntries(newSelecteds);
-      return;
-    }
-    setSelectedFoodEntries([]);
-  };
-
-  const handleSelectionChange = (selected: string[], id: string) => () => {
-    setSelectedFoodEntries(selectHandler(selected, id));
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(parseInt(event.target.value));
-    setPage(0);
-  };
-
-  const createSortHandler =
-    (property: any) => (event: React.MouseEvent<unknown>) => {
-      handleRequestSort(event, property);
-    };
-
-  const toggleFoodEntryModal = () => {
-    setEditableFoodEntry(isFoodEntryModalOpen ? undefined : editableFoodEntry);
-    setIsFoodEntryModalOpen(!isFoodEntryModalOpen);
-  };
-
-  const handleEditClick = (foodEntry: FoodEntry) => () => {
-    setEditableFoodEntry(foodEntry);
-    setIsFoodEntryModalOpen(true);
-  };
-
-  const handleDeleteFoodEntries = (idList: string[]) => async () => {
-    try {
-      await deleteFoodEntries(idList).unwrap();
-      NotificationManager.success("Food entries deleted successfully");
-    } catch (error: any) {
-      console.log(error);
-      NotificationManager.error(error.data.message);
-    }
-  };
-
-  useEffect(() => {
-    setFoodEntryList(data || []);
-  }, [data]);
+  const {
+    list,
+    parentList,
+    isLoading,
+    order,
+    orderBy,
+    page,
+    isEditModalOpen,
+    rowsPerPage,
+    selectedItems,
+    editableItem,
+    toggleEditModal,
+    handleDeleteItems,
+    handleSelectAllClick,
+    handlePageChange,
+    handleEditClick,
+    handleRowsPerPageChange,
+    handleSelectionChange,
+    createSortHandler,
+    setItemList,
+    setSelectedItems,
+  } = useSortableTable<FoodEntry>({
+    defaultOrderKey: "name",
+    deleteItemsMutation: useDeleteFoodEntryMutation,
+    getItemsQuery: useGetFoodEntriesQuery,
+  });
 
   return (
     <CustomCard sx={{ p: "20px" }}>
       <SortedTableToolbar
-        selectedItems={selectedFoodEntries}
+        selectedItems={selectedItems}
         buttonText="Add FoodEntry"
-        buttonClick={toggleFoodEntryModal}
-        mainTableData={data ?? []}
+        buttonClick={toggleEditModal}
+        mainTableData={parentList}
         searchFields={["name"]}
-        onDelete={handleDeleteFoodEntries(selectedFoodEntries)}
-        setFilteredItem={setFoodEntryList}
-        setSelectedItems={setSelectedFoodEntries}
+        onDelete={handleDeleteItems(selectedItems)}
+        setFilteredItem={setItemList}
+        setSelectedItems={setSelectedItems}
       />
 
       {isLoading ? (
@@ -137,12 +85,11 @@ const FoodEntries = () => {
                     sx={{ color: "#757575" }}
                     onChange={handleSelectAllClick}
                     indeterminate={
-                      selectedFoodEntries.length > 0 &&
-                      selectedFoodEntries.length < foodEntryList.length
+                      selectedItems.length > 0 &&
+                      selectedItems.length < list.length
                     }
                     checked={
-                      foodEntryList.length > 0 &&
-                      selectedFoodEntries.length === foodEntryList.length
+                      list.length > 0 && selectedItems.length === list.length
                     }
                   />
                 </TableCell>
@@ -166,13 +113,10 @@ const FoodEntries = () => {
             </TableHead>
 
             <TableBody>
-              {stableSort(foodEntryList, getComparator(order, orderBy))
+              {stableSort(list, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
-                  const isItemSelected = isSelected(
-                    row._id,
-                    selectedFoodEntries,
-                  );
+                  const isItemSelected = isSelected(row._id, selectedItems);
 
                   return (
                     <TableRow
@@ -187,7 +131,7 @@ const FoodEntries = () => {
                           sx={{ color: "#757575" }}
                           checked={isItemSelected}
                           onClick={handleSelectionChange(
-                            selectedFoodEntries,
+                            selectedItems,
                             row._id,
                           )}
                         />
@@ -196,7 +140,7 @@ const FoodEntries = () => {
                         {row.name}
                       </TableCell>
                       <TableCell align="left">
-                        {(row.meal as Meal).name}
+                        {(row.meal as Meal)?.name}
                       </TableCell>
                       <TableCell align="left">{row.calorie}</TableCell>
                       <TableCell align="left">
@@ -207,9 +151,9 @@ const FoodEntries = () => {
                         <SortedTableAction
                           onEdit={handleEditClick({
                             ...row,
-                            meal: (row.meal as Meal)._id,
+                            meal: (row.meal as Meal)?._id,
                           })}
-                          onDelete={handleDeleteFoodEntries([row._id])}
+                          onDelete={handleDeleteItems([row._id])}
                         />
                       </TableCell>
                     </TableRow>
@@ -220,29 +164,29 @@ const FoodEntries = () => {
         </TableContainer>
       )}
 
-      {foodEntryList.length > 0 && (
+      {list.length > 0 && (
         <TablePagination
           page={page}
           component="div"
           rowsPerPage={rowsPerPage}
-          count={foodEntryList.length}
+          count={list.length}
           rowsPerPageOptions={[10, 20, 50, 100]}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
         />
       )}
 
-      {isFoodEntryModalOpen && (
+      {isEditModalOpen && (
         <Dialog
           maxWidth="sm"
           scroll="body"
           fullWidth
-          open={isFoodEntryModalOpen}
-          onClose={toggleFoodEntryModal}
+          open={isEditModalOpen}
+          onClose={toggleEditModal}
         >
           <FoodEntryEditor
-            foodEntry={editableFoodEntry}
-            closeModal={toggleFoodEntryModal}
+            foodEntry={editableItem}
+            closeModal={toggleEditModal}
           />
         </Dialog>
       )}

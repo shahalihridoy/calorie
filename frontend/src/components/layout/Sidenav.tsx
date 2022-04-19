@@ -3,7 +3,7 @@ import CustomImage from "@components/atoms/CustomImage";
 import CustomScrollbar from "@components/atoms/CustomScrollbar";
 import NextLink from "@components/atoms/NextLink";
 import { H2 } from "@components/atoms/Typography";
-import { CustomDrawer } from "@components/layout/NavbarStyles";
+import { CustomDrawer } from "@components/layout/LayoutStyles";
 import SidenavList from "@components/layout/SidenavList";
 import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import { IconButton } from "@mui/material";

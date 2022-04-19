@@ -3,6 +3,7 @@ import CustomCard from "@components/atoms/CustomCard";
 import DataLoader from "@components/atoms/DataLoader";
 import SortedTableToolbar from "@components/atoms/SortedTableToolbar";
 import DashboardLayout from "@components/layout/DashboardLayout";
+import useSortableTable from "@hooks/useSortableTable";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -16,7 +17,7 @@ import { AuthRoles } from "@shared/enums";
 import { ellipsis } from "@shared/styles";
 import { getComparator, stableSort } from "@utils/utils";
 import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 interface Threshold {
   date: string;
@@ -24,49 +25,29 @@ interface Threshold {
 }
 
 const Thresholds = () => {
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<keyof Threshold>("date");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [thresholdList, setThresholdList] = useState<Threshold[]>([]);
-
-  const { data, isLoading } = useGetFoodEntriesThresholdQuery();
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Threshold,
-  ) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(parseInt(event.target.value));
-    setPage(0);
-  };
-
-  const createSortHandler =
-    (property: any) => (event: React.MouseEvent<unknown>) => {
-      handleRequestSort(event, property);
-    };
-
-  useEffect(() => {
-    setThresholdList(data ?? []);
-  }, [data]);
+  const {
+    list,
+    parentList,
+    isLoading,
+    order,
+    orderBy,
+    page,
+    rowsPerPage,
+    handlePageChange,
+    handleRowsPerPageChange,
+    createSortHandler,
+    setItemList,
+  } = useSortableTable<Threshold>({
+    defaultOrderKey: "date",
+    getItemsQuery: useGetFoodEntriesThresholdQuery,
+  });
 
   return (
     <CustomCard sx={{ p: "20px" }}>
       <SortedTableToolbar
-        mainTableData={data ?? []}
+        mainTableData={parentList ?? []}
         searchFields={["date"]}
-        setFilteredItem={setThresholdList}
+        setFilteredItem={setItemList}
       />
 
       {isLoading ? (
@@ -102,7 +83,7 @@ const Thresholds = () => {
             </TableHead>
 
             <TableBody>
-              {stableSort(thresholdList, getComparator(order, orderBy))
+              {stableSort(list, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   return (
@@ -129,15 +110,15 @@ const Thresholds = () => {
         </TableContainer>
       )}
 
-      {thresholdList.length > 0 && (
+      {list.length > 0 && (
         <TablePagination
           page={page}
           component="div"
           rowsPerPage={rowsPerPage}
-          count={thresholdList.length}
+          count={list.length}
           rowsPerPageOptions={[10, 20, 50, 100]}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
         />
       )}
     </CustomCard>

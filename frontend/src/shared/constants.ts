@@ -1,11 +1,7 @@
-import { Languages } from "@shared/enums";
-
 export const NAVBAR_HEIGHT = 80;
 export const TOPBAR_HEIGHT = 80;
 export const SIDENAV_WIDTH = 260;
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-export const RTLLanguages = [Languages.ARABIC, Languages.HEBREW];
 
 export const userToken = {
   user1:

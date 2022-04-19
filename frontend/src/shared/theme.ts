@@ -117,28 +117,6 @@ const theme = createTheme({
         "& #nprogress .peg": {
           boxShadow: `0 0 10px ${primary.main}, 0 0 5px ${primary.main} !important`,
         },
-        ".MuiDataGrid-root": {
-          border: "none !important",
-        },
-        ".MuiDataGrid-columnHeader:focus, & .MuiDataGrid-cell:focus": {
-          outline: "none !important",
-        },
-        ".MuiDataGrid-root .MuiDataGrid-columnHeader:focus-within, .MuiDataGrid-root .MuiDataGrid-cell:focus-within":
-          {
-            outline: "none !important",
-          },
-        ".MuiDataGrid-columnHeaderTitleContainer": {
-          paddingLeft: "0 !important",
-          paddingRight: "0 !important",
-        },
-        ".MuiDataGrid-root .MuiCircularProgress-root": {
-          height: "1.75rem !important",
-          width: "1.75rem !important",
-        },
-        // ".MuiAutocomplete-listbox li.MuiAutocomplete-option": {
-        //   padding: "0rem 0.25rem !important",
-        //   textTransform: "capitalize",
-        // },
       },
     },
     MuiPaper: {

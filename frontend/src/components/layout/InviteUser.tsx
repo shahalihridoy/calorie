@@ -139,7 +139,7 @@ const initialValues = {
 };
 
 const formSchema = yup.object().shape({
-  name: yup.string().required("Food name is required"),
+  name: yup.string().required("User name is required"),
   email: yup.string().email("Invalid email").required("Email name is required"),
 });
 

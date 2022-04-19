@@ -1,11 +1,11 @@
 import withAuth from "@auth/withAuth";
 import CustomCard from "@components/atoms/CustomCard";
 import DataLoader from "@components/atoms/DataLoader";
-import NotificationManager from "@components/atoms/NotificationManager";
 import SortedTableAction from "@components/atoms/SortedTableAction";
 import SortedTableToolbar from "@components/atoms/SortedTableToolbar";
 import DashboardLayout from "@components/layout/DashboardLayout";
 import MealEditor from "@components/pages/meal/MealEditor";
+import useSortableTable from "@hooks/useSortableTable";
 import { Dialog } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import Table from "@mui/material/Table";
@@ -20,100 +20,48 @@ import { useDeleteMealMutation, useGetMealsQuery } from "@redux/meal/mealApi";
 import { AuthRoles } from "@shared/enums";
 import { ellipsis } from "@shared/styles";
 import { Meal } from "@shared/types";
-import {
-  getComparator,
-  isSelected,
-  selectHandler,
-  stableSort,
-} from "@utils/utils";
-import React, { useEffect, useState } from "react";
+import { getComparator, isSelected, stableSort } from "@utils/utils";
+import React from "react";
 
 const Meals = () => {
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<keyof Meal>("name");
-  const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
-  const [isMealModalOpen, setIsMealModalOpen] = useState(false);
-  const [editableMeal, setEditableMeal] = useState<Meal>();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [mealList, setMealList] = useState<Meal[]>([]);
-
-  const [deleteMeals] = useDeleteMealMutation();
-  const { data, isLoading } = useGetMealsQuery();
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Meal,
-  ) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelecteds = mealList.map((n) => n._id);
-      setSelectedMeals(newSelecteds);
-      return;
-    }
-    setSelectedMeals([]);
-  };
-
-  const handleSelectionChange = (selected: string[], id: string) => () => {
-    setSelectedMeals(selectHandler(selected, id));
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(parseInt(event.target.value));
-    setPage(0);
-  };
-
-  const createSortHandler =
-    (property: any) => (event: React.MouseEvent<unknown>) => {
-      handleRequestSort(event, property);
-    };
-
-  const toggleMealModal = () => {
-    setEditableMeal(isMealModalOpen ? undefined : editableMeal);
-    setIsMealModalOpen(!isMealModalOpen);
-  };
-
-  const handleEditClick = (product: Meal) => () => {
-    setEditableMeal(product);
-    setIsMealModalOpen(true);
-  };
-
-  const handleDeleteMeals = (idList: string[]) => async () => {
-    try {
-      await deleteMeals(idList).unwrap();
-      NotificationManager.success("Meals deleted successfully");
-    } catch (error: any) {
-      console.log(error);
-      NotificationManager.error(error.data.message);
-    }
-  };
-
-  useEffect(() => {
-    setMealList(data || []);
-  }, [data]);
+  const {
+    list,
+    parentList,
+    isLoading,
+    order,
+    orderBy,
+    page,
+    isEditModalOpen,
+    rowsPerPage,
+    selectedItems,
+    editableItem,
+    toggleEditModal,
+    handleDeleteItems,
+    handleSelectAllClick,
+    handlePageChange,
+    handleEditClick,
+    handleRowsPerPageChange,
+    handleSelectionChange,
+    createSortHandler,
+    setItemList,
+    setSelectedItems,
+  } = useSortableTable<Meal>({
+    defaultOrderKey: "name",
+    deleteItemsMutation: useDeleteMealMutation,
+    getItemsQuery: useGetMealsQuery,
+  });
 
   return (
     <CustomCard sx={{ p: "20px" }}>
       <SortedTableToolbar
-        selectedItems={selectedMeals}
+        selectedItems={selectedItems}
         buttonText="Add Meal"
-        buttonClick={toggleMealModal}
-        mainTableData={data ?? []}
+        buttonClick={toggleEditModal}
+        mainTableData={parentList ?? []}
         searchFields={["name"]}
-        onDelete={handleDeleteMeals(selectedMeals)}
-        setFilteredItem={setMealList}
-        setSelectedItems={setSelectedMeals}
+        onDelete={handleDeleteItems(selectedItems)}
+        setFilteredItem={setItemList}
+        setSelectedItems={setSelectedItems}
       />
 
       {isLoading ? (
@@ -133,12 +81,11 @@ const Meals = () => {
                     sx={{ color: "#757575" }}
                     onChange={handleSelectAllClick}
                     indeterminate={
-                      selectedMeals.length > 0 &&
-                      selectedMeals.length < mealList.length
+                      selectedItems.length > 0 &&
+                      selectedItems.length < list.length
                     }
                     checked={
-                      mealList.length > 0 &&
-                      selectedMeals.length === mealList.length
+                      list.length > 0 && selectedItems.length === list.length
                     }
                   />
                 </TableCell>
@@ -162,10 +109,10 @@ const Meals = () => {
             </TableHead>
 
             <TableBody>
-              {stableSort(mealList, getComparator(order, orderBy))
+              {stableSort(list, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
-                  const isItemSelected = isSelected(row._id, selectedMeals);
+                  const isItemSelected = isSelected(row._id, selectedItems);
 
                   return (
                     <TableRow
@@ -180,7 +127,7 @@ const Meals = () => {
                           sx={{ color: "#757575" }}
                           checked={isItemSelected}
                           onClick={handleSelectionChange(
-                            selectedMeals,
+                            selectedItems,
                             row._id,
                           )}
                         />
@@ -194,7 +141,7 @@ const Meals = () => {
                       <TableCell align="left">
                         <SortedTableAction
                           onEdit={handleEditClick(row)}
-                          onDelete={handleDeleteMeals([row._id])}
+                          onDelete={handleDeleteItems([row._id])}
                         />
                       </TableCell>
                     </TableRow>
@@ -205,27 +152,27 @@ const Meals = () => {
         </TableContainer>
       )}
 
-      {mealList.length > 0 && (
+      {list.length > 0 && (
         <TablePagination
           page={page}
           component="div"
           rowsPerPage={rowsPerPage}
-          count={mealList.length}
+          count={list.length}
           rowsPerPageOptions={[10, 20, 50, 100]}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
         />
       )}
 
-      {isMealModalOpen && (
+      {isEditModalOpen && (
         <Dialog
           maxWidth="sm"
           scroll="body"
           fullWidth
-          open={isMealModalOpen}
-          onClose={toggleMealModal}
+          open={isEditModalOpen}
+          onClose={toggleEditModal}
         >
-          <MealEditor meal={editableMeal} closeModal={toggleMealModal} />
+          <MealEditor meal={editableItem} closeModal={toggleEditModal} />
         </Dialog>
       )}
     </CustomCard>

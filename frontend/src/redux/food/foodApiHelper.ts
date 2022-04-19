@@ -1,19 +1,11 @@
-import { BaseQueryFnArgs } from "@redux/axiosBaseQuery";
 import { foodApi } from "@redux/food/foodApi";
-import { BaseQueryFn } from "@reduxjs/toolkit/dist/query";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 import { thresholdCalorie } from "@shared/constants";
-import { FoodEntry, Meal } from "@shared/types";
+import { BaseQueryFunction, FoodEntry, Meal } from "@shared/types";
 import { transformRTKResponse } from "@utils/RTKUtils";
 
 export type IBuilder = EndpointBuilder<
-  BaseQueryFn<
-    string | BaseQueryFnArgs,
-    unknown,
-    unknown,
-    Record<string, unknown>,
-    Record<string, unknown>
-  >,
+  BaseQueryFunction,
   "Food-Entries" | "Food-Entries-Threshold" | "Food-Entries-Analytics",
   "foodApi"
 >;

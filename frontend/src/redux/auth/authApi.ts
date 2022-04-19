@@ -12,21 +12,23 @@ export const authApi = createApi({
     prepareHeaders,
   }),
   endpoints: (builder) => ({
+    getUser: builder.query<any, void>({
+      query: () => "/auth/verify-token",
+      providesTags: [{ type: "User", id: "me" }],
+      transformResponse: transformRTKResponse,
+    }),
+    getAllUsers: builder.query<any, void>({
+      query: () => "/users",
+      providesTags: [{ type: "User", id: "all" }],
+      transformResponse: transformRTKResponse,
+    }),
     inviteUser: builder.mutation<any, { email: string; name: string }>({
       query: (credentials) => ({
         url: "/auth/invite",
         method: "POST",
         data: credentials,
       }),
-    }),
-    getUser: builder.query<any, void>({
-      query: () => "/auth/verify-token",
-      providesTags: [{ type: "User" }],
-      transformResponse: transformRTKResponse,
-    }),
-    getAllUsers: builder.query<any, void>({
-      query: () => "/users",
-      transformResponse: transformRTKResponse,
+      invalidatesTags: [{ type: "User", id: "all" }],
     }),
   }),
   extractRehydrationInfo: (action, { reducerPath }) => {

@@ -1,22 +1,10 @@
-import { BaseQueryFnArgs } from "@redux/axiosBaseQuery";
 import { foodApi } from "@redux/food/foodApi";
 import { mealApi } from "@redux/meal/mealApi";
-import { BaseQueryFn } from "@reduxjs/toolkit/dist/query";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
-import { Meal } from "@shared/types";
+import { BaseQueryFunction, Meal } from "@shared/types";
 import { transformRTKResponse } from "@utils/RTKUtils";
 
-export type IBuilder = EndpointBuilder<
-  BaseQueryFn<
-    string | BaseQueryFnArgs,
-    unknown,
-    unknown,
-    Record<string, unknown>,
-    Record<string, unknown>
-  >,
-  "Meal",
-  "mealApi"
->;
+export type IBuilder = EndpointBuilder<BaseQueryFunction, "Meal", "mealApi">;
 
 class FoodApiHelper {
   static getMeals = (builder: IBuilder) =>
@@ -109,6 +97,9 @@ class FoodApiHelper {
         try {
           await queryFulfilled;
           const idSet = new Set(idList);
+
+          // invalidate the entries for the meal
+          dispatch(foodApi.util.invalidateTags(["Food-Entries"]));
 
           dispatch(
             mealApi.util.updateQueryData(
