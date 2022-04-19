@@ -130,6 +130,7 @@ exports.addFoodEntry = catchAsync(async (req, res, next) => {
   endDate.setHours(23, 59, 59, 999);
 
   const p1 = await FoodEntry.count({
+    user: req.user._id,
     date: {
       $gte: startDate,
       $lte: endDate,
