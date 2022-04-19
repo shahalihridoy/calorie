@@ -177,13 +177,7 @@ const FoodEntries = () => {
       )}
 
       {isEditModalOpen && (
-        <Dialog
-          maxWidth="sm"
-          scroll="body"
-          fullWidth
-          open={isEditModalOpen}
-          onClose={toggleEditModal}
-        >
+        <Dialog maxWidth="sm" scroll="body" fullWidth open={isEditModalOpen}>
           <FoodEntryEditor
             foodEntry={editableItem}
             closeModal={toggleEditModal}

@@ -121,7 +121,7 @@ const FoodEntryEditor: FC<Props> = ({ foodEntry, closeModal }) => {
               <Grid item xs={12} md={6}>
                 <CustomTextField
                   fullWidth
-                  label="Name"
+                  label="Food Name"
                   name="name"
                   value={values.name}
                   onChange={handleChange}
